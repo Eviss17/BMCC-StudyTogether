@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}BMCC StudyTogether{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='site.css') }}?v=20260512-auth-redesign">
+</head>
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="BMCC Logo">
+        <span>BMCC StudyTogether</span>
+    </div>
+
+    <nav>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('edit_profile') }}">Edit Profile</a>
+
+        <form action="{{ url_for('logout') }}" method="POST">
+            <button type="submit">Log out</button>
+        </form>
+    </nav>
+</header>
+
+{% block content %}
+{% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block title %}BMCC StudyTogether | Home{% endblock %}
+{% block content %}
+<section class="hero">
+    <div class="hero-copy">
+        <p class="eyebrow">BMCC Accessible Education</p>
+        <h1>Inclusive learning support for BMCC students in one study platform.</h1>
+        <p class="hero-text">
+            StudyBridge helps BMCC students from different educational, linguistic, and cultural
+            backgrounds access learning support in one place. Students can log in, register for
+            classes, explore course materials, use book and YouTube resources, join study groups,
+            request academic help, and book free tutoring appointments.
+        </p>
+        <div class="hero-actions">
+            <a href="{{ url_for('register') }}" class="primary-button">Create student account</a>
+            <a href="{{ url_for('login') }}" class="secondary-button">Sign in</a>
+        </div>
+    </div>
+    <div class="hero-panel">
+        <h2>How this supports accessibility</h2>
+        <ul class="feature-list">
+            <li>Student registration and login</li>
+            <li>Class enrollment for 4 supported courses</li>
+            <li>Course materials, book resources, and video learning</li>
+            <li>Academic help requests for students who need support</li>
+            <li>Study groups that encourage peer connection</li>
+            <li>Free tutoring appointment booking</li>
+            <li>One simple platform for inclusive academic access</li>
+        </ul>
+    </div>
+</section>
+
+<section class="courses-grid">
+    {% for course in courses %}
+    <article class="card">
+        <p class="card-code">{{ course["code"] }}</p>
+        <h3>{{ course["title"] }}</h3>
+        <p>{{ course["description"] }}</p>
+        <div class="mini-links">
+            <a href="{{ course['book_link'] }}" target="_blank" rel="noreferrer">Book</a>
+            <a href="{{ course['video_url'] }}" target="_blank" rel="noreferrer">YouTube Video</a>
+        </div>
+    </article>
+    {% endfor %}
+</section>
+{% endblock %}

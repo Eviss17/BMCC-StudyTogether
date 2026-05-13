@@ -1,0 +1,67 @@
+{% extends "layout.html" %}
+{% block title %}BMCC StudyTogether | Register{% endblock %}
+{% block content %}
+<section class="auth-modern-shell register-modern-shell">
+    <div class="auth-modern-panel register-panel">
+        <div class="auth-brand-lockup">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="BMCC Logo">
+            <div>
+                <strong>BMCC StudyTogether</strong>
+                <span>Create your student workspace</span>
+            </div>
+        </div>
+
+        <div class="auth-copy compact-auth-copy">
+            <p class="eyebrow">New Student Account</p>
+            <h1>Create your study profile</h1>
+        </div>
+
+        <form method="POST" class="auth-modern-form register-modern-form">
+            <label>First Name
+                <input type="text" name="first_name" placeholder="Enter your first name" required>
+            </label>
+            <label>Last Name
+                <input type="text" name="last_name" placeholder="Enter your last name" required>
+            </label>
+            <label>Student ID
+                <input type="text" name="emplid" placeholder="Enter your student ID" required>
+            </label>
+            <label>Email
+                <input type="email" name="email" placeholder="Enter your email" required>
+            </label>
+            <label>Phone
+                <input type="text" name="phone" placeholder="Enter your phone number" required>
+            </label>
+            <label>Major
+                <input type="text" name="major" placeholder="Enter your major" required>
+            </label>
+            <label class="full-width">Password
+                <input type="password" name="password" placeholder="Create a password" required>
+            </label>
+            <button type="submit" class="primary-button full-width">Create Account</button>
+        </form>
+
+        <div class="auth-qr-card">
+            <div class="qr-code" aria-hidden="true">
+                <span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span>
+            </div>
+            <div>
+                <strong>Study anywhere</strong>
+                <p>Your schedule, readings, videos, and AI notes stay in one place.</p>
+            </div>
+        </div>
+
+        <p class="auth-switch">Already have an account? <a href="{{ url_for('login') }}">Login</a>.</p>
+    </div>
+
+    <div class="auth-image-panel" role="img" aria-label="Fiterman Hall at BMCC">
+        <div class="auth-image-content">
+            <span class="status-pill">BMCC Connected</span>
+            <h2>Join study groups and build better habits from day one.</h2>
+        </div>
+    </div>
+</section>
+{% endblock %}

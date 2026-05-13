@@ -1,0 +1,450 @@
+{% extends "layout.html" %}
+{% block title %}BMCC StudyTogether | {{ course["code"] }}{% endblock %}
+{% block content %}
+<main class="workspace-shell course-workspace">
+    <aside class="workspace-sidebar">
+        <div class="sidebar-brand">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="BMCC Logo">
+            <div>
+                <strong>BMCC</strong>
+                <span>StudyTogether</span>
+            </div>
+        </div>
+        <nav class="workspace-nav">
+            <a href="{{ url_for('dashboard') }}">My Courses</a>
+            <a href="#study-sessions">Study Sessions</a>
+            <a href="#ai-assistant">AI Assistant</a>
+            <a href="#resources">Resources</a>
+            <a href="{{ url_for('edit_profile') }}">Settings</a>
+        </nav>
+        <div class="sidebar-quote">
+            <strong>“</strong>
+            <p>Keep learning.<br>Keep growing.<br>You've got this!</p>
+            <span aria-hidden="true">♥</span>
+        </div>
+    </aside>
+
+    <section class="workspace-main">
+        <section class="course-header workspace-banner course-hero">
+            <div>
+                <p class="eyebrow">{{ course["code"] }}</p>
+                <h1>{{ course["title"] }}</h1>
+                <p class="hero-text">{{ course["description"] }}</p>
+            </div>
+            <div class="course-hero-visual" aria-hidden="true">
+                <img src="{{ url_for('static', filename='images/ai-assistant-clean.png') }}" alt="">
+            </div>
+            <div class="course-actions">
+                <span class="status-pill">{% if is_enrolled %}Enrolled{% else %}Open Course{% endif %}</span>
+                <a class="secondary-button" href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+                <a class="secondary-button" href="{{ url_for('course_quiz', course_id=course['course_id']) }}">Take Quiz</a>
+                <form action="{{ url_for('enroll', course_id=course['course_id']) }}" method="post">
+                    <button type="submit" class="primary-button" {% if is_enrolled %}disabled{% endif %}>
+                        {% if is_enrolled %}Registered{% else %}Register{% endif %}
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <section class="top-action-row" id="study-sessions">
+            <article class="action-card session-form-card study-planner-card">
+                <div class="study-action-visual image-visual" aria-hidden="true">
+                    <img src="{{ url_for('static', filename='images/study-group-clean.png') }}" alt="">
+                </div>
+                <div class="study-action-copy">
+                    <p class="card-code">Create Study Session</p>
+                    <h2>Plan with classmates</h2>
+                    <p>Set a time, place, and topic in under a minute.</p>
+                </div>
+                <div class="study-planner-side">
+                    <div class="study-feature-list">
+                        <span><span class="feature-icon" aria-hidden="true">📅</span>Schedule in seconds</span>
+                        <span><span class="feature-icon" aria-hidden="true">💻</span>Online or in-person sessions</span>
+                        <span><span class="feature-icon" aria-hidden="true">👥</span>Collaborate with classmates</span>
+                    </div>
+                    <details class="inline-details">
+                        <summary class="primary-button">Create Study Session</summary>
+                        <form action="{{ url_for('create_study_session', course_id=course['course_id']) }}" method="post" class="stacked-form compact-session-form">
+                            <label>Session title
+                                <input type="text" name="title" placeholder="Midterm review, homework help..." required>
+                            </label>
+                            <div class="inline-fields">
+                                <label>Date
+                                    <input type="date" name="session_date" required>
+                                </label>
+                                <label>Time
+                                    <input type="time" name="session_time" required>
+                                </label>
+                            </div>
+                            <label>Meeting type
+                                <select name="meeting_type" required>
+                                    <option value="Online">Online</option>
+                                    <option value="In Person">In Person</option>
+                                </select>
+                            </label>
+                            <label>Location or meeting link
+                                <input type="text" name="location" placeholder="https://meet.jit.si/... or Library Room 2" required>
+                            </label>
+                            <label>Topic or description
+                                <textarea name="description" rows="3" placeholder="What will students work on together?" required></textarea>
+                            </label>
+                            <button type="submit" class="primary-button full-width">Create Session</button>
+                        </form>
+                    </details>
+                </div>
+            </article>
+
+            <article class="action-card live-room-card live-study-card">
+                <div class="live-room-visual image-visual" aria-hidden="true">
+                    <img src="{{ url_for('static', filename='images/live-room-clean.png') }}" alt="">
+                </div>
+                <div class="live-room-copy">
+                    <p class="card-code">Live Study Room</p>
+                    <h2>Live room</h2>
+                    <p class="room-name">BMCC-{{ course["code"] }}-StudyRoom</p>
+                    <p>Open a shared study room for quick review or group work.</p>
+                </div>
+                <a class="primary-button full-width" href="https://meet.jit.si/BMCC-{{ course['code'] }}-StudyRoom" target="_blank" rel="noreferrer">
+                    Join Live Study Room
+                </a>
+            </article>
+        </section>
+
+        <section class="card sessions-table-card workspace-card-flat">
+            <div class="section-heading">
+                <div>
+                    <p class="card-code">Upcoming Study Sessions</p>
+                    <h2>Classmate study schedule</h2>
+                </div>
+            </div>
+            {% if sessions %}
+            <div class="sessions-table">
+                <div class="sessions-row sessions-head">
+                    <span>Title</span>
+                    <span>Date</span>
+                    <span>Time</span>
+                    <span>Type</span>
+                    <span>Location</span>
+                    <span>Created By</span>
+                    <span>Action</span>
+                </div>
+                {% for session in sessions %}
+                <div class="sessions-row">
+                    <strong>{{ session["title"] }}</strong>
+                    <span>{{ session["session_date"] }}</span>
+                    <span>{{ session["session_time"] }}</span>
+                    <span>{{ session["meeting_type"] }}</span>
+                    <span>
+                        {% if session["meeting_type"] == "Online" %}
+                            <a href="{{ session['location'] }}" target="_blank" rel="noreferrer">{{ session["location"] }}</a>
+                        {% else %}
+                            {{ session["location"] }}
+                        {% endif %}
+                    </span>
+                    <span>{% if session["student_id"] == logged_in_student["student_id"] %}You{% else %}{{ session["first_name"] }} {{ session["last_name"] }}{% endif %}</span>
+                    <span>
+                        {% if session["student_id"] == logged_in_student["student_id"] %}
+                            <span class="status-pill creator-pill">Creator</span>
+                        {% elif session["joined"] %}
+                            <form action="{{ url_for('unenroll_study_session', session_id=session['session_id']) }}" method="post" class="session-action-form">
+                                <button type="submit" class="secondary-button compact-button">Unenroll</button>
+                            </form>
+                        {% else %}
+                            <form action="{{ url_for('enroll_study_session', session_id=session['session_id']) }}" method="post" class="session-action-form">
+                                <button type="submit" class="primary-button compact-button">Enroll</button>
+                            </form>
+                        {% endif %}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <strong>No study sessions yet.</strong>
+                <span>Create the first session for this course.</span>
+            </div>
+            {% endif %}
+        </section>
+
+        <section class="insight-grid">
+            <article class="card ai-dashboard-card workspace-card-flat" id="ai-assistant">
+                <div class="section-heading">
+                    <div>
+                        <p class="card-code">AI Study Assistant</p>
+                        <h2>Plan, summarize, and review</h2>
+                    </div>
+                    <div class="ai-orb-visual" aria-hidden="true">
+                        <img src="{{ url_for('static', filename='images/ai-assistant-clean.png') }}" alt="">
+                    </div>
+                </div>
+                <form action="{{ url_for('ai_assistant') }}" method="post" class="ai-form ai-submit-form">
+                    <input type="hidden" name="course_id" value="{{ course['course_id'] }}">
+                    <textarea name="prompt" rows="3" placeholder="Ask for a summary, quiz plan, practice questions, or study checklist..." required></textarea>
+                    <button type="submit" class="primary-button">Ask AI</button>
+                </form>
+                <p class="muted-copy ai-loading-message" hidden>Generating your study summary, quiz questions, and study tips...</p>
+                <div class="quick-actions">
+                    <button type="button">Summarize notes</button>
+                    <button type="button">Create study plan</button>
+                    <button type="button">Review chapters</button>
+                    <button type="button">Prepare for quizzes</button>
+                </div>
+                <div id="notes" class="notes-preview compact-notes">
+                    <h3>Recent AI Notes</h3>
+                    {% if ai_sessions %}
+                        {% for session in ai_sessions %}
+                        <div class="resource-item">
+                            <p><strong>Question:</strong> {{ session["prompt"] }}</p>
+                            <p>{{ session["response"] }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="muted-copy">AI helper responses will appear here after you ask a question.</p>
+                    {% endif %}
+                </div>
+
+                <details class="support-details">
+                    <summary>Course support tools</summary>
+                    <div class="support-tools">
+                        <article class="support-tool" id="study-group">
+                            <h3>Study Group</h3>
+                            {% for group in groups %}
+                            <p class="tag">{{ group["meeting_time"] }}</p>
+                            <p><strong>{{ group["name"] }}</strong></p>
+                            <p>{{ group["description"] }}</p>
+                            <p><strong>Location:</strong> {{ group["location"] }}</p>
+                            <form action="{{ url_for('join_group', group_id=group['group_id']) }}" method="post">
+                                <button type="submit" class="secondary-button compact-button" {% if group['joined'] %}disabled{% endif %}>
+                                    {% if group["joined"] %}Joined{% else %}Join Study Group{% endif %}
+                                </button>
+                            </form>
+                            {% endfor %}
+                        </article>
+
+                        <article class="support-tool" id="tutoring">
+                            <h3>Tutoring</h3>
+                            <form action="{{ url_for('book_tutoring', course_id=course['course_id']) }}" method="post" class="stacked-form">
+                                <label>Date and time
+                                    <input type="datetime-local" name="appointment_time" required>
+                                </label>
+                                <label>Topic
+                                    <input type="text" name="topic" placeholder="Exam review, homework, essay draft..." required>
+                                </label>
+                                <button type="submit" class="primary-button full-width">Request Tutoring</button>
+                            </form>
+                        </article>
+
+                        <article class="support-tool">
+                            <h3>Help Request</h3>
+                            <p>{{ course["help_text"] }}</p>
+                            <form action="{{ url_for('request_help', course_id=course['course_id']) }}" method="post" class="stacked-form">
+                                <label>Your question
+                                    <textarea name="question" rows="3" placeholder="What topic do you need help with?" required></textarea>
+                                </label>
+                                <button type="submit" class="primary-button full-width">Send Help Request</button>
+                            </form>
+                        </article>
+                    </div>
+                </details>
+            </article>
+
+            <article class="card motivation-card workspace-card-flat">
+                <p class="card-code">Daily Motivation</p>
+                <h2>Keep the work moving</h2>
+                <div class="quote-rotator" aria-live="polite">
+                    <blockquote>
+                        <span class="quote-check" aria-hidden="true"></span>
+                        Small, steady study sessions beat last-minute panic.
+                    </blockquote>
+                    <blockquote>
+                        <span class="quote-check" aria-hidden="true"></span>
+                        One clear question can unlock an entire chapter.
+                    </blockquote>
+                    <blockquote>
+                        <span class="quote-check" aria-hidden="true"></span>
+                        Review one resource today and your future self gets a lighter load.
+                    </blockquote>
+                </div>
+                <p class="muted-copy">Today: review one resource, ask one question, and join or create a session.</p>
+            </article>
+        </section>
+
+        <section class="card resources-tabs-card workspace-card-flat" id="resources">
+            <div class="section-heading">
+                <div>
+                    <p class="card-code">Course Resources</p>
+                    <h2>Readings, PDFs, videos, and course info</h2>
+                </div>
+            </div>
+
+            <div class="resource-tabs">
+                <input type="radio" name="course-resource-tabs" id="tab-readings" checked>
+                <input type="radio" name="course-resource-tabs" id="tab-pdfs">
+                <input type="radio" name="course-resource-tabs" id="tab-videos">
+                <input type="radio" name="course-resource-tabs" id="tab-textbook">
+                <input type="radio" name="course-resource-tabs" id="tab-professor">
+
+                <div class="tab-labels">
+                    <label for="tab-readings">Readings</label>
+                    <label for="tab-pdfs">PDFs</label>
+                    <label for="tab-videos">Videos</label>
+                    <label for="tab-textbook">Textbook</label>
+                    <label for="tab-professor">Professor</label>
+                </div>
+
+                <div class="tab-panels">
+                    <section class="tab-panel readings-panel">
+                        {% if readings %}
+                        <div class="readings-grid">
+                            {% for reading in readings %}
+                            <article class="reading-card">
+                                <div class="book-icon" aria-hidden="true">Book</div>
+                                <div class="reading-content">
+                                    <p class="tag">{{ reading["author"] }}</p>
+                                    <h3>{{ reading["title"] }}</h3>
+                                    <p>{{ reading["theme"] }}</p>
+                                </div>
+                                <div class="reading-actions">
+                                    <a class="primary-button compact-button" href="{{ reading['url'] }}" target="_blank" rel="noreferrer">Open Reading</a>
+                                    <form action="{{ url_for('ai_assistant') }}" method="post" class="ai-submit-form">
+                                        <input type="hidden" name="course_id" value="{{ course['course_id'] }}">
+                                        <input type="hidden" name="prompt" value="Summarize {{ reading['title'] }} by {{ reading['author'] }} for an ENG201 literature discussion. Include the main idea, major themes, and two useful essay angles.">
+                                        <button type="submit" class="secondary-button compact-button">AI Summary</button>
+                                    </form>
+                                    <form action="{{ url_for('ai_assistant') }}" method="post" class="ai-submit-form">
+                                        <input type="hidden" name="course_id" value="{{ course['course_id'] }}">
+                                        <input type="hidden" name="prompt" value="Create discussion questions for {{ reading['title'] }} by {{ reading['author'] }}. Include questions about theme, character or voice, language, and essay interpretation.">
+                                        <button type="submit" class="secondary-button compact-button">Discussion Questions</button>
+                                    </form>
+                                </div>
+                            </article>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="empty-state">
+                            <strong>No required readings listed.</strong>
+                            <span>Use the PDFs and videos tabs for this course.</span>
+                        </div>
+                        {% endif %}
+                    </section>
+
+                    <section class="tab-panel pdfs-panel">
+                        <div class="resource-panel-grid">
+                            <div class="material-list">
+                                {% for material in materials %}
+                                {% if material["url"].startswith("pdfs/") %}
+                                <div class="material-card">
+                                    <div class="pdf-icon">PDF</div>
+                                    <div>
+                                        <p class="tag">{{ material["material_type"] }}</p>
+                                        <h3>{{ material["title"] }}</h3>
+                                        <p>{{ material["description"] }}</p>
+                                        <a class="secondary-button compact-button" href="{{ url_for('static', filename=material['url']) }}" target="_blank" rel="noreferrer">Open PDF</a>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+
+                            <div class="web-resource-list compact-web-links">
+                                <h3>Course links</h3>
+                                {% for material in materials %}
+                                {% if not material["url"].startswith("pdfs/") %}
+                                <div class="resource-item">
+                                    <p class="tag">{{ material["material_type"] }}</p>
+                                    <h3>{{ material["title"] }}</h3>
+                                    <p>{{ material["description"] }}</p>
+                                    <a href="{{ material['url'] }}" target="_blank" rel="noreferrer">Open link</a>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="tab-panel videos-panel">
+                        <div class="video-resource-layout">
+                            <div>
+                                <h3>{{ course["video_title"] }}</h3>
+                                {% if video_embed_url %}
+                                <div class="video-frame">
+                                    <iframe
+                                        src="{{ video_embed_url }}"
+                                        title="{{ course['video_title'] }}"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                        allowfullscreen>
+                                    </iframe>
+                                </div>
+                                {% else %}
+                                <div class="video-link-panel">
+                                    <p>Open the course video collection on YouTube.</p>
+                                </div>
+                                {% endif %}
+                                <a class="secondary-button compact-button" href="{{ course['video_url'] }}" target="_blank" rel="noreferrer">Open on YouTube</a>
+                            </div>
+
+                            {% if videos %}
+                            <div class="video-list">
+                                <h3>{{ course["code"] }} lecture videos</h3>
+                                {% for video in videos %}
+                                <article class="lecture-video-card">
+                                    {% set thumbnail = youtube_thumbnail_url(video["url"]) %}
+                                    {% if thumbnail %}
+                                    <img src="{{ thumbnail }}" alt="{{ video['title'] }} thumbnail">
+                                    {% else %}
+                                    <div class="video-thumbnail-fallback">Video</div>
+                                    {% endif %}
+                                    <div>
+                                        <h4>{{ video["title"] }}</h4>
+                                        <a class="secondary-button compact-button" href="{{ video['url'] }}" target="_blank" rel="noreferrer">Watch Video</a>
+                                    </div>
+                                </article>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </section>
+
+                    <section class="tab-panel textbook-panel">
+                        <div class="textbook-panel-card">
+                            <p class="card-code">Textbook</p>
+                            <h3>{{ course["book_title"] }}</h3>
+                            <p>Use the textbook while preparing for class, quizzes, tutoring, and study sessions.</p>
+                            <a class="primary-button" href="{{ course['book_link'] }}" target="_blank" rel="noreferrer">Open Book</a>
+                        </div>
+                    </section>
+
+                    <section class="tab-panel professor-panel">
+                        <div class="professor-panel-card">
+                            <p class="card-code">Professor Information</p>
+                            {% if professor %}
+                                <h3>{{ professor["name"] }}</h3>
+                                <p><strong>Email:</strong> <a href="mailto:{{ professor['email'] }}">{{ professor["email"] }}</a></p>
+                                <p><strong>Office:</strong> {{ professor["office_location"] }}</p>
+                                <p><strong>Office hours:</strong> {{ professor["office_hours"] }}</p>
+                            {% else %}
+                                <h3>Professor information coming soon</h3>
+                            {% endif %}
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </section>
+    </section>
+</main>
+<script>
+    document.querySelectorAll(".ai-submit-form").forEach((form) => {
+        form.addEventListener("submit", () => {
+            const button = form.querySelector("button[type='submit']");
+            const loadingMessage = document.querySelector(".ai-loading-message");
+            if (button) {
+                button.disabled = true;
+                button.textContent = "Generating...";
+            }
+            if (loadingMessage) {
+                loadingMessage.hidden = false;
+            }
+        });
+    });
+</script>
+{% endblock %}

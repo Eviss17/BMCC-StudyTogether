@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block title %}
+Edit Student
+{% endblock %}
+{% block content %}
+        <h1>Edit Student Record</h1>
+        {% for row in rows %}
+        <form action="{{ url_for('update') }}" method="POST">
+            <h3 style="color:blue">Student ID: {{ row['student_id']}}</h3>
+            <input type="hidden" name="id" value="{{ row['student_id'] }}">
+            
+            First Name<br>
+            <input type="text" name="first_name" value="{{ row['name'].split()[0] if row['name'] else '' }}"/><br>
+
+            Last Name<br>
+            <input type="text" name="last_name" value="{{ row['name'].split()[1] if ' ' in row['name'] else '' }}"/><br>
+
+            EMPLID<br>
+            <input type="text" name="emplid" value="{{ row['emplid'] }}"/><br>
+
+            Email<br>
+            <input type="email" name="email" value="{{ row['email'] if row['email'] else '' }}"/><br>
+
+            Phone<br>
+            <input type="text" name="phone" value="{{ row['phone'] if row['phone'] else '' }}"/><br>
+
+            Major<br>
+            <input type="text" name="major" value="{{ row['major'] }}"/><br>
+
+            <input type="submit" value="Submit" /><br>
+        </form>
+        {% endfor %}
+{% endblock %}

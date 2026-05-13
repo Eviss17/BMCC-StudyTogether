@@ -1,0 +1,40 @@
+<form action="{{ url_for('addrec') }}" method="POST">
+    <h3>Add Study Request:</h3>
+
+    First Name<br>
+    <input type="text" name="first_name" /><br>
+
+    Last Name<br>
+    <input type="text" name="last_name" /><br>
+
+    EMPLID<br>
+    <input type="text" name="emplid" /><br>
+
+    Email<br>
+    <input type="text" name="email" /><br>
+
+    Phone<br>
+    <input type="text" name="phone" /><br>
+
+    Major<br>
+    <input type="text" name="major" /><br>
+
+    Course<br>
+    <select name="course_id">
+        <option value="1">ENG101 - English Composition I</option>
+        <option value="2">ENG102 - English Composition II</option>
+        <option value="3">MAT150 - College Algebra</option>
+        <option value="4">MAT301 - Calculus I</option>
+        <option value="5">MAT302 - Calculus II</option>
+        <option value="6">CIS100 - Intro to Computers</option>
+        <option value="7">CIS395 - Database Systems I</option>
+        <option value="8">BIO101 - Biology I</option>
+        <option value="9">PSY100 - Psychology</option>
+        <option value="10">HIS101 - World History</option>
+    </select><br><br>
+
+    Study Date<br>
+    <input type="date" name="study_date" /><br><br>
+
+    <input type="submit" value="Submit" /><br>
+</form>

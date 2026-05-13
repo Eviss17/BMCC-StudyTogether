@@ -1,0 +1,87 @@
+{% extends "layout.html" %}
+{% block title %}BMCC StudyTogether | Login{% endblock %}
+{% block content %}
+<style>
+    .topbar { display: none; }
+    body { background: #003366; }
+</style>
+<section class="auth-modern-shell login-modern-shell">
+    <div class="login-showcase">
+        <div class="login-logo-lockup">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="BMCC Logo">
+            <span>Borough of Manhattan<br>Community College</span>
+        </div>
+
+        <div class="login-hero-copy">
+            <h1>Welcome to<br>BMCC <span>StudyTogether</span></h1>
+            <p>Your collaborative learning platform.<br>Study. Connect. Succeed. <span>Together.</span></p>
+        </div>
+
+        <div class="login-mobile-card">
+            <div>
+                <strong>Join on mobile</strong>
+                <p>Scan the QR code to access StudyTogether on your phone.</p>
+            </div>
+            <div class="qr-code login-qr" aria-hidden="true">
+                <span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span>
+            </div>
+        </div>
+
+        <div class="login-benefits">
+            <div>
+                <span aria-hidden="true">👥</span>
+                <strong>Collaborate</strong>
+                <p>Work with classmates in study sessions</p>
+            </div>
+            <div>
+                <span aria-hidden="true">📘</span>
+                <strong>Learn</strong>
+                <p>Access resources and AI study tools</p>
+            </div>
+            <div>
+                <span aria-hidden="true">📈</span>
+                <strong>Achieve</strong>
+                <p>Stay motivated and reach your goals</p>
+            </div>
+        </div>
+
+        <p class="login-security">Secure • Private • BMCC Powered</p>
+    </div>
+
+    <div class="login-card-wrap">
+        <div class="login-card">
+            <div class="login-card-icon" aria-hidden="true">🎓</div>
+            <h2>Sign in to your account</h2>
+            <p>Enter your information to continue</p>
+
+            <form action="{{ url_for('login') }}" method="post" class="auth-modern-form login-form-card">
+                <label>Username / Email
+                    <input type="email" name="email" placeholder="Enter your username or email" required>
+                </label>
+                <label>Password
+                    <input type="password" name="password" placeholder="Enter your password" required>
+                </label>
+                <div class="login-form-options">
+                    <label class="remember-row">
+                        <input type="checkbox" name="remember">
+                        Remember me
+                    </label>
+                    <a href="{{ url_for('login') }}">Forgot password?</a>
+                </div>
+                <button type="submit" class="primary-button full-width">Sign In</button>
+            </form>
+
+            <div class="login-divider"><span>or continue with</span></div>
+            <div class="login-provider-row">
+                <button type="button">Google</button>
+                <button type="button">Microsoft</button>
+            </div>
+
+            <p class="auth-switch">New to StudyTogether? <a href="{{ url_for('register') }}">Create an account</a></p>
+        </div>
+    </div>
+</section>
+{% endblock %}

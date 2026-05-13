@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Edit Profile
+{% endblock %}
+
+{% block content %}
+
+<h2>Edit Profile</h2>
+
+<form method="POST">
+
+    First Name<br>
+    <input type="text" name="first_name" value="{{ student['first_name'] }}" required><br><br>
+
+    Last Name<br>
+    <input type="text" name="last_name" value="{{ student['last_name'] }}" required><br><br>
+
+    Email<br>
+    <input type="email" name="email" value="{{ student['email'] }}" required><br><br>
+
+    Phone<br>
+    <input type="text" name="phone" value="{{ student['phone'] }}" required><br><br>
+
+    Major<br>
+    <input type="text" name="major" value="{{ student['major'] }}" required><br><br>
+
+    <button type="submit">Save Changes</button>
+
+</form>
+
+<br>
+
+<a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+
+{% endblock %}

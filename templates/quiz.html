@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block title %}BMCC StudyTogether | {{ course["code"] }} Quiz{% endblock %}
+{% block content %}
+<main class="container">
+    <section class="course-header">
+        <div>
+            <p class="eyebrow">{{ course["code"] }}</p>
+            <h1>{{ quiz["title"] }}</h1>
+            <p class="hero-text">Answer each question, submit your quiz, and your score will be saved to the database.</p>
+        </div>
+        <a class="secondary-button" href="{{ url_for('course_detail', course_id=course['course_id']) }}">Back to Course</a>
+    </section>
+
+    {% if score is not none %}
+    <section class="flash success">
+        You scored {{ score }} out of {{ questions|length }}.
+    </section>
+    {% endif %}
+
+    <form method="post" class="quiz-form">
+        {% for question in questions %}
+        <article class="card quiz-question">
+            <p class="card-code">Question {{ loop.index }}</p>
+            <h2>{{ question["question_text"] }}</h2>
+            <label>
+                <input type="radio" name="question_{{ question['question_id'] }}" value="{{ question['option_a'] }}" required>
+                {{ question["option_a"] }}
+            </label>
+            <label>
+                <input type="radio" name="question_{{ question['question_id'] }}" value="{{ question['option_b'] }}">
+                {{ question["option_b"] }}
+            </label>
+            <label>
+                <input type="radio" name="question_{{ question['question_id'] }}" value="{{ question['option_c'] }}">
+                {{ question["option_c"] }}
+            </label>
+            <label>
+                <input type="radio" name="question_{{ question['question_id'] }}" value="{{ question['option_d'] }}">
+                {{ question["option_d"] }}
+            </label>
+        </article>
+        {% endfor %}
+        <button type="submit" class="primary-button">Submit Quiz</button>
+    </form>
+</main>
+{% endblock %}
