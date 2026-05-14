@@ -2,7 +2,8 @@
 
 BMCC StudyTogether is a student collaboration platform created for a Database Systems class project. The application helps students access course materials, study resources, videos, and collaboration tools in one place.
 
-## Youtube https://www.youtube.com/watch?v=WClV8SrQPr8
+# Youtube
+https://www.youtube.com/watch?v=WClV8SrQPr8
 
 ## Features
 
