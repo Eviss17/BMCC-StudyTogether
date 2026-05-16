@@ -6,16 +6,16 @@ Dashboard
 
 {% block content %}
 
-<div class="container">
+<div class="container dashboard-page">
 
     <div class="dashboard-header">
-        <p>Student dashboard</p>
+        <p class="dashboard-kicker">Student dashboard</p>
 
         <h1>
             {{ student['first_name'] }} {{ student['last_name'] }}
         </h1>
 
-        <p>
+        <p class="student-meta-line">
             {{ student['major'] }} |
             {{ student['email'] }} |
             Student ID {{ student['emplid'] }}
@@ -25,27 +25,39 @@ Dashboard
     <div class="stats-grid">
 
         <div class="stat-card">
-            <h3>Enrollments</h3>
-            <div class="number">{{ enrollments|length }}</div>
-            <p>Classes registered.</p>
+            <div class="stat-icon" aria-hidden="true">E</div>
+            <div>
+                <h3>Enrollments</h3>
+                <div class="number">{{ enrollments|length }}</div>
+                <p>Classes registered.</p>
+            </div>
         </div>
 
         <div class="stat-card">
-            <h3>Tutoring</h3>
-            <div class="number">{{ appointments|length }}</div>
-            <p>Tutoring sessions booked.</p>
+            <div class="stat-icon" aria-hidden="true">T</div>
+            <div>
+                <h3>Tutoring</h3>
+                <div class="number">{{ appointments|length }}</div>
+                <p>Tutoring sessions booked.</p>
+            </div>
         </div>
 
         <div class="stat-card">
-            <h3>Help Requests</h3>
-            <div class="number">{{ help_requests|length }}</div>
-            <p>Questions submitted.</p>
+            <div class="stat-icon" aria-hidden="true">H</div>
+            <div>
+                <h3>Help Requests</h3>
+                <div class="number">{{ help_requests|length }}</div>
+                <p>Questions submitted.</p>
+            </div>
         </div>
 
         <div class="stat-card">
-            <h3>Study Groups</h3>
-            <div class="number">{{ groups|length }}</div>
-            <p>Groups joined.</p>
+            <div class="stat-icon" aria-hidden="true">G</div>
+            <div>
+                <h3>Study Groups</h3>
+                <div class="number">{{ groups|length }}</div>
+                <p>Groups joined.</p>
+            </div>
         </div>
 
     </div>
@@ -54,7 +66,10 @@ Dashboard
 
         <div>
 
-            <h2>Your Available Classes</h2>
+            <div class="dashboard-section-heading">
+                <p>Course workspace</p>
+                <h2>Your Available Classes</h2>
+            </div>
 
             <div class="course-grid">
 
@@ -62,8 +77,16 @@ Dashboard
 
                 <div class="course-card">
 
-                    <div class="course-code">
-                        {{ course['code'] }}
+                    <div class="course-card-top">
+                        <div class="course-code">
+                            {{ course['code'] }}
+                        </div>
+
+                        {% if course['is_enrolled'] %}
+                            <span class="course-status registered">Registered</span>
+                        {% else %}
+                            <span class="course-status">Open</span>
+                        {% endif %}
                     </div>
 
                     <h3>{{ course['title'] }}</h3>
@@ -71,9 +94,9 @@ Dashboard
                     <p>{{ course['description'] }}</p>
 
                     {% if course['is_enrolled'] %}
-                        <p><strong>Registered</strong></p>
+                        <p class="course-note"><strong>Registered</strong></p>
                     {% else %}
-                        <p>Open for registration</p>
+                        <p class="course-note">Open for registration</p>
                     {% endif %}
 
                     <a class="button"
@@ -92,10 +115,13 @@ Dashboard
         <div>
 
             <div class="sidebar-card">
-                <h3>Registered Classes</h3>
+                <div class="sidebar-card-heading">
+                    <span aria-hidden="true">R</span>
+                    <h3>Registered Classes</h3>
+                </div>
 
                 {% if enrollments %}
-                    <ul>
+                    <ul class="dashboard-list">
                     {% for enrollment in enrollments %}
                         <li>
                             {{ enrollment['code'] }} -
@@ -109,10 +135,13 @@ Dashboard
             </div>
 
             <div class="sidebar-card">
-                <h3>Upcoming Tutoring</h3>
+                <div class="sidebar-card-heading">
+                    <span aria-hidden="true">T</span>
+                    <h3>Upcoming Tutoring</h3>
+                </div>
 
                 {% if appointments %}
-                    <ul>
+                    <ul class="dashboard-list">
                     {% for appointment in appointments %}
                         <li>
                             {{ appointment['code'] }}
@@ -126,10 +155,13 @@ Dashboard
             </div>
 
             <div class="sidebar-card">
-                <h3>Recent Help Requests</h3>
+                <div class="sidebar-card-heading">
+                    <span aria-hidden="true">H</span>
+                    <h3>Recent Help Requests</h3>
+                </div>
 
                 {% if help_requests %}
-                    <ul>
+                    <ul class="dashboard-list">
                     {% for request in help_requests %}
                         <li>
                             {{ request['code'] }}

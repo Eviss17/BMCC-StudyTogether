@@ -19,8 +19,8 @@ Edit Profile
     Email<br>
     <input type="email" name="email" value="{{ student['email'] }}" required><br><br>
 
-    Phone<br>
-    <input type="text" name="phone" value="{{ student['phone'] }}" required><br><br>
+    Student ID<br>
+    <input type="text" name="emplid" value="{{ student['emplid'] }}" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" title="Student ID must be exactly 8 digits" required><br><br>
 
     Major<br>
     <input type="text" name="major" value="{{ student['major'] }}" required><br><br>

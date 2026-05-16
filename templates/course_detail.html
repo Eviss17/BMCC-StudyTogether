@@ -31,9 +31,6 @@
                 <h1>{{ course["title"] }}</h1>
                 <p class="hero-text">{{ course["description"] }}</p>
             </div>
-            <div class="course-hero-visual" aria-hidden="true">
-                <img src="{{ url_for('static', filename='images/ai-assistant-clean.png') }}" alt="">
-            </div>
             <div class="course-actions">
                 <span class="status-pill">{% if is_enrolled %}Enrolled{% else %}Open Course{% endif %}</span>
                 <a class="secondary-button" href="{{ url_for('dashboard') }}">Back to Dashboard</a>
@@ -57,13 +54,18 @@
                     <p>Set a time, place, and topic in under a minute.</p>
                 </div>
                 <div class="study-planner-side">
-                    <div class="study-feature-list">
-                        <span><span class="feature-icon" aria-hidden="true">📅</span>Schedule in seconds</span>
-                        <span><span class="feature-icon" aria-hidden="true">💻</span>Online or in-person sessions</span>
-                        <span><span class="feature-icon" aria-hidden="true">👥</span>Collaborate with classmates</span>
-                    </div>
-                    <details class="inline-details">
-                        <summary class="primary-button">Create Study Session</summary>
+                    <button type="button" class="primary-button open-session-modal">Create Study Session</button>
+                </div>
+
+                <div class="session-modal-backdrop" id="session-modal" aria-hidden="true">
+                    <div class="session-modal-panel" role="dialog" aria-modal="true" aria-labelledby="session-modal-title">
+                        <div class="session-modal-heading">
+                            <div>
+                                <p class="card-code">Create Study Session</p>
+                                <h2 id="session-modal-title">Plan a classmate study session</h2>
+                            </div>
+                            <button type="button" class="secondary-button modal-cancel-button">Cancel</button>
+                        </div>
                         <form action="{{ url_for('create_study_session', course_id=course['course_id']) }}" method="post" class="stacked-form compact-session-form">
                             <label>Session title
                                 <input type="text" name="title" placeholder="Midterm review, homework help..." required>
@@ -90,7 +92,7 @@
                             </label>
                             <button type="submit" class="primary-button full-width">Create Session</button>
                         </form>
-                    </details>
+                    </div>
                 </div>
             </article>
 
@@ -102,7 +104,7 @@
                     <p class="card-code">Live Study Room</p>
                     <h2>Live room</h2>
                     <p class="room-name">BMCC-{{ course["code"] }}-StudyRoom</p>
-                    <p>Open a shared study room for quick review or group work.</p>
+                    <p>Collaborate live with classmates in real time.</p>
                 </div>
                 <a class="primary-button full-width" href="https://meet.jit.si/BMCC-{{ course['code'] }}-StudyRoom" target="_blank" rel="noreferrer">
                     Join Live Study Room
@@ -166,128 +168,25 @@
             {% endif %}
         </section>
 
-        <section class="insight-grid">
-            <article class="card ai-dashboard-card workspace-card-flat" id="ai-assistant">
-                <div class="section-heading">
-                    <div>
-                        <p class="card-code">AI Study Assistant</p>
-                        <h2>Plan, summarize, and review</h2>
-                    </div>
-                    <div class="ai-orb-visual" aria-hidden="true">
-                        <img src="{{ url_for('static', filename='images/ai-assistant-clean.png') }}" alt="">
-                    </div>
-                </div>
-                <form action="{{ url_for('ai_assistant') }}" method="post" class="ai-form ai-submit-form">
-                    <input type="hidden" name="course_id" value="{{ course['course_id'] }}">
-                    <textarea name="prompt" rows="3" placeholder="Ask for a summary, quiz plan, practice questions, or study checklist..." required></textarea>
-                    <button type="submit" class="primary-button">Ask AI</button>
-                </form>
-                <p class="muted-copy ai-loading-message" hidden>Generating your study summary, quiz questions, and study tips...</p>
-                <div class="quick-actions">
-                    <button type="button">Summarize notes</button>
-                    <button type="button">Create study plan</button>
-                    <button type="button">Review chapters</button>
-                    <button type="button">Prepare for quizzes</button>
-                </div>
-                <div id="notes" class="notes-preview compact-notes">
-                    <h3>Recent AI Notes</h3>
-                    {% if ai_sessions %}
-                        {% for session in ai_sessions %}
-                        <div class="resource-item">
-                            <p><strong>Question:</strong> {{ session["prompt"] }}</p>
-                            <p>{{ session["response"] }}</p>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <p class="muted-copy">AI helper responses will appear here after you ask a question.</p>
-                    {% endif %}
-                </div>
-
-                <details class="support-details">
-                    <summary>Course support tools</summary>
-                    <div class="support-tools">
-                        <article class="support-tool" id="study-group">
-                            <h3>Study Group</h3>
-                            {% for group in groups %}
-                            <p class="tag">{{ group["meeting_time"] }}</p>
-                            <p><strong>{{ group["name"] }}</strong></p>
-                            <p>{{ group["description"] }}</p>
-                            <p><strong>Location:</strong> {{ group["location"] }}</p>
-                            <form action="{{ url_for('join_group', group_id=group['group_id']) }}" method="post">
-                                <button type="submit" class="secondary-button compact-button" {% if group['joined'] %}disabled{% endif %}>
-                                    {% if group["joined"] %}Joined{% else %}Join Study Group{% endif %}
-                                </button>
-                            </form>
-                            {% endfor %}
-                        </article>
-
-                        <article class="support-tool" id="tutoring">
-                            <h3>Tutoring</h3>
-                            <form action="{{ url_for('book_tutoring', course_id=course['course_id']) }}" method="post" class="stacked-form">
-                                <label>Date and time
-                                    <input type="datetime-local" name="appointment_time" required>
-                                </label>
-                                <label>Topic
-                                    <input type="text" name="topic" placeholder="Exam review, homework, essay draft..." required>
-                                </label>
-                                <button type="submit" class="primary-button full-width">Request Tutoring</button>
-                            </form>
-                        </article>
-
-                        <article class="support-tool">
-                            <h3>Help Request</h3>
-                            <p>{{ course["help_text"] }}</p>
-                            <form action="{{ url_for('request_help', course_id=course['course_id']) }}" method="post" class="stacked-form">
-                                <label>Your question
-                                    <textarea name="question" rows="3" placeholder="What topic do you need help with?" required></textarea>
-                                </label>
-                                <button type="submit" class="primary-button full-width">Send Help Request</button>
-                            </form>
-                        </article>
-                    </div>
-                </details>
-            </article>
-
-            <article class="card motivation-card workspace-card-flat">
-                <p class="card-code">Daily Motivation</p>
-                <h2>Keep the work moving</h2>
-                <div class="quote-rotator" aria-live="polite">
-                    <blockquote>
-                        <span class="quote-check" aria-hidden="true"></span>
-                        Small, steady study sessions beat last-minute panic.
-                    </blockquote>
-                    <blockquote>
-                        <span class="quote-check" aria-hidden="true"></span>
-                        One clear question can unlock an entire chapter.
-                    </blockquote>
-                    <blockquote>
-                        <span class="quote-check" aria-hidden="true"></span>
-                        Review one resource today and your future self gets a lighter load.
-                    </blockquote>
-                </div>
-                <p class="muted-copy">Today: review one resource, ask one question, and join or create a session.</p>
-            </article>
-        </section>
-
         <section class="card resources-tabs-card workspace-card-flat" id="resources">
             <div class="section-heading">
                 <div>
                     <p class="card-code">Course Resources</p>
-                    <h2>Readings, PDFs, videos, and course info</h2>
+                    <h2>PDFs, videos, readings, textbook, and professor info</h2>
                 </div>
             </div>
 
             <div class="resource-tabs">
-                <input type="radio" name="course-resource-tabs" id="tab-readings" checked>
-                <input type="radio" name="course-resource-tabs" id="tab-pdfs">
+                <input type="radio" name="course-resource-tabs" id="tab-pdfs" checked>
                 <input type="radio" name="course-resource-tabs" id="tab-videos">
+                <input type="radio" name="course-resource-tabs" id="tab-readings">
                 <input type="radio" name="course-resource-tabs" id="tab-textbook">
                 <input type="radio" name="course-resource-tabs" id="tab-professor">
 
                 <div class="tab-labels">
-                    <label for="tab-readings">Readings</label>
                     <label for="tab-pdfs">PDFs</label>
                     <label for="tab-videos">Videos</label>
+                    <label for="tab-readings">Readings</label>
                     <label for="tab-textbook">Textbook</label>
                     <label for="tab-professor">Professor</label>
                 </div>
@@ -430,9 +329,142 @@
                 </div>
             </div>
         </section>
+
+        <section class="insight-grid ai-bottom-section">
+            <article class="card ai-dashboard-card workspace-card-flat" id="ai-assistant">
+                <div class="section-heading">
+                    <div>
+                        <p class="card-code">AI Study Assistant</p>
+                        <h2>Plan, summarize, and review</h2>
+                    </div>
+                    <div class="ai-orb-visual" aria-hidden="true">
+                        <img src="{{ url_for('static', filename='images/ai-assistant-clean.png') }}" alt="">
+                    </div>
+                </div>
+                <form action="{{ url_for('ai_assistant') }}" method="post" class="ai-form ai-submit-form">
+                    <input type="hidden" name="course_id" value="{{ course['course_id'] }}">
+                    <textarea name="prompt" rows="3" placeholder="Ask for a summary, quiz plan, practice questions, or study checklist..." required></textarea>
+                    <button type="submit" class="primary-button">Ask AI</button>
+                </form>
+                <p class="muted-copy ai-loading-message" hidden>Generating your study summary, quiz questions, and study tips...</p>
+                <div class="quick-actions">
+                    <button type="button">Summarize notes</button>
+                    <button type="button">Create study plan</button>
+                    <button type="button">Review chapters</button>
+                    <button type="button">Prepare for quizzes</button>
+                </div>
+                <div id="notes" class="notes-preview compact-notes">
+                    <h3>Recent AI Notes</h3>
+                    {% if ai_sessions %}
+                        {% for session in ai_sessions %}
+                        <div class="resource-item">
+                            <p><strong>Question:</strong> {{ session["prompt"] }}</p>
+                            <p>{{ session["response"] }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="muted-copy">AI helper responses will appear here after you ask a question.</p>
+                    {% endif %}
+                </div>
+
+                <details class="support-details">
+                    <summary>Course support tools</summary>
+                    <div class="support-tools">
+                        <article class="support-tool" id="study-group">
+                            <h3>Study Group</h3>
+                            {% for group in groups %}
+                            <p class="tag">{{ group["meeting_time"] }}</p>
+                            <p><strong>{{ group["name"] }}</strong></p>
+                            <p>{{ group["description"] }}</p>
+                            <p><strong>Location:</strong> {{ group["location"] }}</p>
+                            <form action="{{ url_for('join_group', group_id=group['group_id']) }}" method="post">
+                                <button type="submit" class="secondary-button compact-button" {% if group['joined'] %}disabled{% endif %}>
+                                    {% if group["joined"] %}Joined{% else %}Join Study Group{% endif %}
+                                </button>
+                            </form>
+                            {% endfor %}
+                        </article>
+
+                        <article class="support-tool" id="tutoring">
+                            <h3>Tutoring</h3>
+                            <form action="{{ url_for('book_tutoring', course_id=course['course_id']) }}" method="post" class="stacked-form">
+                                <label>Date and time
+                                    <input type="datetime-local" name="appointment_time" required>
+                                </label>
+                                <label>Topic
+                                    <input type="text" name="topic" placeholder="Exam review, homework, essay draft..." required>
+                                </label>
+                                <button type="submit" class="primary-button full-width">Request Tutoring</button>
+                            </form>
+                        </article>
+
+                        <article class="support-tool">
+                            <h3>Help Request</h3>
+                            <p>{{ course["help_text"] }}</p>
+                            <form action="{{ url_for('request_help', course_id=course['course_id']) }}" method="post" class="stacked-form">
+                                <label>Your question
+                                    <textarea name="question" rows="3" placeholder="What topic do you need help with?" required></textarea>
+                                </label>
+                                <button type="submit" class="primary-button full-width">Send Help Request</button>
+                            </form>
+                        </article>
+                    </div>
+                </details>
+            </article>
+
+            <article class="card motivation-card workspace-card-flat">
+                <p class="card-code">Daily Motivation</p>
+                <h2>Keep the work moving</h2>
+                <div class="quote-rotator" aria-live="polite">
+                    <blockquote>
+                        <span class="quote-check" aria-hidden="true"></span>
+                        Small, steady study sessions beat last-minute panic.
+                    </blockquote>
+                    <blockquote>
+                        <span class="quote-check" aria-hidden="true"></span>
+                        One clear question can unlock an entire chapter.
+                    </blockquote>
+                    <blockquote>
+                        <span class="quote-check" aria-hidden="true"></span>
+                        Review one resource today and your future self gets a lighter load.
+                    </blockquote>
+                </div>
+                <p class="muted-copy">Today: review one resource, ask one question, and join or create a session.</p>
+            </article>
+        </section>
     </section>
 </main>
 <script>
+    const sessionModal = document.querySelector("#session-modal");
+    const openSessionModalButton = document.querySelector(".open-session-modal");
+
+    if (sessionModal && openSessionModalButton) {
+        openSessionModalButton.addEventListener("click", () => {
+            sessionModal.classList.add("is-open");
+            sessionModal.setAttribute("aria-hidden", "false");
+            document.body.classList.add("session-modal-open");
+        });
+
+        sessionModal.addEventListener("click", (event) => {
+            if (event.target === sessionModal) {
+                sessionModal.classList.remove("is-open");
+                sessionModal.setAttribute("aria-hidden", "true");
+                document.body.classList.remove("session-modal-open");
+            }
+        });
+    }
+
+    document.querySelectorAll(".modal-cancel-button").forEach((button) => {
+        button.addEventListener("click", () => {
+            const modal = button.closest(".session-modal-backdrop");
+            if (modal) {
+                modal.classList.remove("is-open");
+                modal.setAttribute("aria-hidden", "true");
+                document.body.classList.remove("session-modal-open");
+            }
+        });
+    });
+
     document.querySelectorAll(".ai-submit-form").forEach((form) => {
         form.addEventListener("submit", () => {
             const button = form.querySelector("button[type='submit']");

@@ -4,8 +4,13 @@ import sqlite3
 from urllib.parse import parse_qs, urlparse
 
 from flask import Flask, flash, g, redirect, render_template, request, session, url_for
+from dotenv import load_dotenv
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from ai_helper import OpenAIError, ask_ai
+
+
+load_dotenv()
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "study-app-secret-key"
@@ -759,43 +764,14 @@ def build_ai_study_response(course, prompt):
     if not topic:
         topic = course["title"]
 
-    # The API key stays outside the codebase; Flask reads it from the shell environment.
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        return (
-            "The AI Study Assistant is almost ready. Set the OPENAI_API_KEY environment variable, "
-            "restart the Flask app, and ask your question again.",
-            False,
-        )
-
     try:
-        from openai import OpenAI, OpenAIError
-    except ImportError:
-        return (
-            "The OpenAI Python package is not installed in this environment. Install it with "
-            "`pip install openai`, then restart the Flask app.",
-            False,
+        # Keep Flask/course context in app.py, and delegate OpenAI work to ai_helper.py.
+        answer = ask_ai(
+            f"Course: {course['code']} - {course['title']}\n"
+            f"Student question: {topic}\n\n"
+            "Create a helpful study response for a BMCC student. Include a short summary, "
+            "a clear study explanation, exactly 3 practice questions, and practical study tips."
         )
-
-    try:
-        client = OpenAI(api_key=api_key)
-        # Use the current OpenAI Python SDK Responses API to generate one structured study answer.
-        response = client.responses.create(
-            model=os.getenv("OPENAI_MODEL", "gpt-4.1-mini"),
-            instructions=(
-                "You are the BMCC StudyTogether AI Study Assistant. Give concise, practical, "
-                "student-friendly help. Use the course code and title as context. Always format "
-                "your answer with exactly these sections: Study Summary, Quiz Questions, Study Tips."
-            ),
-            input=(
-                f"Course: {course['code']} - {course['title']}\n"
-                f"Student question: {topic}"
-            ),
-            max_output_tokens=550,
-        )
-        answer = getattr(response, "output_text", "").strip()
-        if not answer:
-            answer = "I received your question, but the AI response was empty. Please try asking again."
         return answer, True
     except OpenAIError as error:
         return (
@@ -803,6 +779,8 @@ def build_ai_study_response(course, prompt):
             f"network connection, or billing status. Details: {error}",
             False,
         )
+    except RuntimeError as error:
+        return str(error), False
     except Exception as error:
         return (
             "Something went wrong while asking the AI Study Assistant. Please try again in a moment. "
@@ -854,10 +832,9 @@ def inject_student():
 
 @app.route("/")
 def home():
-    courses = get_db().execute("SELECT * FROM study_courses ORDER BY code").fetchall()
     if session.get("student_id"):
         return redirect(url_for("dashboard"))
-    return render_template("home.html", courses=courses)
+    return redirect(url_for("login"))
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -867,12 +844,15 @@ def register():
         last_name = request.form["last_name"].strip()
         emplid = request.form["emplid"].strip()
         email = request.form["email"].strip().lower()
-        phone = request.form["phone"].strip()
         major = request.form["major"].strip()
         password = request.form["password"]
 
-        if not all([first_name, last_name, emplid, email, phone, major, password]):
+        if not all([first_name, last_name, emplid, email, major, password]):
             flash("Please complete every registration field.", "error")
+            return render_template("register.html")
+
+        if not (emplid.isdigit() and len(emplid) == 8):
+            flash("Student ID must be exactly 8 digits.", "error")
             return render_template("register.html")
 
         try:
@@ -888,7 +868,7 @@ def register():
                     last_name,
                     emplid,
                     email,
-                    phone,
+                    "",
                     major,
                     generate_password_hash(password),
                 ),
@@ -1436,11 +1416,15 @@ def edit_profile():
         first_name = request.form["first_name"].strip()
         last_name = request.form["last_name"].strip()
         email = request.form["email"].strip().lower()
-        phone = request.form["phone"].strip()
+        emplid = request.form["emplid"].strip()
         major = request.form["major"].strip()
 
-        if not all([first_name, last_name, email, phone, major]):
+        if not all([first_name, last_name, email, emplid, major]):
             flash("Please complete all profile fields.", "error")
+            return render_template("edit_profile.html", student=student)
+
+        if not (emplid.isdigit() and len(emplid) == 8):
+            flash("Student ID must be exactly 8 digits.", "error")
             return render_template("edit_profile.html", student=student)
 
         try:
@@ -1449,14 +1433,14 @@ def edit_profile():
             db.execute(
                 """
                 UPDATE students
-                SET first_name = ?, last_name = ?, email = ?, phone = ?, major = ?
+                SET first_name = ?, last_name = ?, email = ?, emplid = ?, major = ?
                 WHERE student_id = ?
                 """,
                 (
                     first_name,
                     last_name,
                     email,
-                    phone,
+                    emplid,
                     major,
                     student["student_id"],
                 ),
@@ -1468,7 +1452,7 @@ def edit_profile():
             return redirect(url_for("dashboard"))
 
         except sqlite3.IntegrityError:
-            flash("That email is already used by another student.", "error")
+            flash("That email or student ID is already used by another student.", "error")
 
     return render_template("edit_profile.html", student=student)
 

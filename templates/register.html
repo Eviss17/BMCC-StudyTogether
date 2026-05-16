@@ -1,66 +1,74 @@
 {% extends "layout.html" %}
 {% block title %}BMCC StudyTogether | Register{% endblock %}
 {% block content %}
-<section class="auth-modern-shell register-modern-shell">
-    <div class="auth-modern-panel register-panel">
-        <div class="auth-brand-lockup">
+<section class="register-split-shell">
+    <div class="register-showcase">
+        <div class="register-logo-lockup">
             <img src="{{ url_for('static', filename='logo.png') }}" alt="BMCC Logo">
+            <span>Borough of Manhattan<br>Community College</span>
+        </div>
+
+        <div class="register-hero-copy">
+            <h1>Welcome to BMCC StudyTogether</h1>
+            <p>Study. Connect. Succeed. Together.</p>
+        </div>
+
+        <div class="register-mobile-card">
             <div>
-                <strong>BMCC StudyTogether</strong>
-                <span>Create your student workspace</span>
+                <strong>Join on mobile</strong>
+                <p>Scan to view the project repository.</p>
             </div>
+            <img src="{{ url_for('static', filename='images/github-qr.png') }}" alt="QR code for project repository">
         </div>
 
-        <div class="auth-copy compact-auth-copy">
-            <p class="eyebrow">New Student Account</p>
-            <h1>Create your study profile</h1>
-        </div>
-
-        <form method="POST" class="auth-modern-form register-modern-form">
-            <label>First Name
-                <input type="text" name="first_name" placeholder="Enter your first name" required>
-            </label>
-            <label>Last Name
-                <input type="text" name="last_name" placeholder="Enter your last name" required>
-            </label>
-            <label>Student ID
-                <input type="text" name="emplid" placeholder="Enter your student ID" required>
-            </label>
-            <label>Email
-                <input type="email" name="email" placeholder="Enter your email" required>
-            </label>
-            <label>Phone
-                <input type="text" name="phone" placeholder="Enter your phone number" required>
-            </label>
-            <label>Major
-                <input type="text" name="major" placeholder="Enter your major" required>
-            </label>
-            <label class="full-width">Password
-                <input type="password" name="password" placeholder="Create a password" required>
-            </label>
-            <button type="submit" class="primary-button full-width">Create Account</button>
-        </form>
-
-        <div class="auth-qr-card">
-            <div class="qr-code" aria-hidden="true">
-                <span></span><span></span><span></span><span></span>
-                <span></span><span></span><span></span><span></span>
-                <span></span><span></span><span></span><span></span>
-                <span></span><span></span><span></span><span></span>
+        <div class="register-benefits">
+            <div>
+                <span aria-hidden="true">C</span>
+                <strong>Collaborate</strong>
+                <p>Work with classmates</p>
             </div>
             <div>
-                <strong>Study anywhere</strong>
-                <p>Your schedule, readings, videos, and AI notes stay in one place.</p>
+                <span aria-hidden="true">L</span>
+                <strong>Learn</strong>
+                <p>Access resources and AI study tools</p>
+            </div>
+            <div>
+                <span aria-hidden="true">A</span>
+                <strong>Achieve</strong>
+                <p>Stay organized and reach your goals</p>
             </div>
         </div>
-
-        <p class="auth-switch">Already have an account? <a href="{{ url_for('login') }}">Login</a>.</p>
     </div>
 
-    <div class="auth-image-panel" role="img" aria-label="Fiterman Hall at BMCC">
-        <div class="auth-image-content">
-            <span class="status-pill">BMCC Connected</span>
-            <h2>Join study groups and build better habits from day one.</h2>
+    <div class="register-card-wrap">
+        <div class="register-profile-card">
+            <div class="register-card-mark" aria-hidden="true">BMCC</div>
+            <h2>Create your study profile</h2>
+            <p>Start with the details your classmates and study tools will use.</p>
+
+            <form method="POST" class="auth-modern-form register-modern-form">
+                <label>First Name
+                    <input type="text" name="first_name" placeholder="Enter your first name" autocomplete="given-name" required>
+                </label>
+                <label>Last Name
+                    <input type="text" name="last_name" placeholder="Enter your last name" autocomplete="family-name" required>
+                </label>
+                <label>Student ID
+                    <input type="text" name="emplid" placeholder="8 digit student ID" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" title="Student ID must be exactly 8 digits" required>
+                </label>
+                <label>Email
+                    <input type="email" name="email" placeholder="Enter your email" autocomplete="email" required>
+                </label>
+                <label>Major
+                    <input type="text" name="major" placeholder="Enter your major" required>
+                </label>
+                <label>Password
+                    <input type="password" name="password" placeholder="Create a password" autocomplete="new-password" required>
+                </label>
+                <button type="submit" class="primary-button full-width">Create Account</button>
+            </form>
+
+            <p class="auth-switch">Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
         </div>
     </div>
 </section>
