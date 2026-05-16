@@ -5,6 +5,15 @@ BMCC StudyTogether is a student collaboration platform created for a Database Sy
 # Youtube
 https://www.youtube.com/watch?v=WClV8SrQPr8
 
+## Screenshots
+
+### Registration Page
+<img width="1462" height="827" alt="create Account" src="https://github.com/user-attachments/assets/4fd3fca6-030b-45b2-ac82-8dba40af5056" />
+
+### Dashboard
+<img width="1470" height="920" alt="Dashboard 1" src="https://github.com/user-attachments/assets/302535c2-110f-4bb1-9cee-02d48a1019b4" />
+
+
 ## Features
 
 - Student registration and login
@@ -80,9 +89,7 @@ Student questions are sent to OpenAI with course context from the Flask app. The
 
 Do not upload your real `.env` file or API key to GitHub. Use `.env.example` as the public template.
 
-## GitHub Repository
 
-[View Project on GitHub](https://github.com/Eviss17/BMCC-StudyTogether)
 
 ## Author
 
